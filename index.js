@@ -216,7 +216,28 @@ async function getTotalSupply() {
   }
 }
 
+async function fetchBalancesWithRateLimit() {
+  const balances = [];
+  for (const { address, chain, type, wallet, name } of contractAddresses) {
+    // Delay to ensure rate limit compliance
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const url = `https://api.arbiscan.io/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
+    try {
+      const response = await axios.get(url);
+      const balance = parseInt(response.data.result, 10);
+      balances.push({ address, balance, chain, type, wallet, name });
+    } catch (error) {
+      console.error(`Error fetching balance for address ${address}:`, error);
+    }
+  }
+  return balances;
+}
+
+
+
 // This is the home-page URL that will show a detailed list of the excluded addresses from the supply and all the data such as total supply, burnt supply, circulating supply, etc.
+// Home route handler
 app.get('/', async (req, res) => {
   const cachedBalances = cache.get('balances');
   if (cachedBalances !== undefined) {
@@ -225,31 +246,17 @@ app.get('/', async (req, res) => {
   }
 
   try {
-    const balances = [];
-
-    for (const { address, chain, type, wallet, name } of contractAddresses) {
-      
-        await new Promise(resolve => setTimeout(resolve, 250));
-
-      const url = `https://api.arbiscan.io/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
-      const response = await axios.get(url);
-      const balance = parseInt(response.data.result);
-
-      balances.push({ address, balance, chain, type, wallet, name });
-    }
-
-    balances.sort((a, b) => b.balance - a.balance); // Sort balances in descending order
+    const balances = await fetchBalancesWithRateLimit();
+    balances.sort((a, b) => b.balance - a.balance);
 
     let totalBalance = 0;
-    
     let tableRows = '';
 
     for (const { address, balance, chain, type, wallet } of balances) {
       totalBalance += balance;
       const bscScanLink = `https://arbiscan.io/token/${cgptContractAddress}?a=${address}`;
- 
       tableRows += `<tr>
-      <td><a href="${bscScanLink}" target="_blank">${address}</a></td>
+        <td><a href="${bscScanLink}" target="_blank">${address}</a></td>
         <td>${Math.floor(balance / 10 ** 18).toLocaleString()}</td>
         <td>${chain}</td>
         <td>${type}</td>
@@ -259,7 +266,8 @@ app.get('/', async (req, res) => {
 
     const totalSupplyEndpointResult = await getTotalSupply();
     const burntTokens = MaxSupply - Math.floor(totalSupplyEndpointResult / 10 ** 18);
-    const totalSupply = MaxSupply - Math.floor(totalBalance / 10 ** 18) - burntTokens;
+    const circulatingSupply = MaxSupply - Math.floor(totalBalance / 10 ** 18) - burntTokens;
+
 
     const htmlResponse = ` <style>
     body {
@@ -347,40 +355,31 @@ app.get('/', async (req, res) => {
       }
     }
   </style>
-  
-  <h1>$KIMA Circulating Supply Tracker</h1>
-  <p>Total Supply: 210,000,000</p>
-  <p>Burnt $KIMA: ${burntTokens.toLocaleString()}</p>
-  <p>Live Circulating Supply of $KIMA: ${totalSupply.toLocaleString()} </p>
-  <br><br>
-  <table>
-    <tr class="title-row">
-      <th>Contract Address</th>
-      <th>Balance (KIMA)</th>
-      <th>Chain</th>
-      <th>Type</th>
-      <th>Name</th>
-    </tr>
-    ${tableRows}
-    <tr class="empty-row">
-      <td colspan="5"></td>
-    </tr>
-    <tr class="total-supply-row">
-      <td>$KIMA Circulating Supply</td>
-      <td>${totalSupply.toLocaleString()}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </table>
-
+        <h1>Token Supply Details</h1>
+      <p>Total Supply: ${MaxSupply.toLocaleString()}</p>
+      <p>Burnt Tokens: ${burntTokens.toLocaleString()}</p>
+      <p>Circulating Supply: ${circulatingSupply.toLocaleString()}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Address</th>
+            <th>Balance</th>
+            <th>Chain</th>
+            <th>Type</th>
+            <th>Wallet</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
     `;
 
     cache.set('balances', htmlResponse); // Cache the response
-
     res.send(htmlResponse);
   } catch (error) {
-    res.status(500).send('Error fetching data');
+    console.error('Error generating response:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
