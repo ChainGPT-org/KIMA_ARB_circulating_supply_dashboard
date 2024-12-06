@@ -10,10 +10,10 @@ const port = 3000;
 // BSCSCAN API Key (ENV)
 const apiKey = process.env.BSCSCAN_API_KEY;
 
-// Contract address of CGPT token (ENV)
+// Contract address of KIMA token (ENV)
 const cgptContractAddress = process.env.CGPT_CONTRACT_ADDRESS;
 
-// Maximum Supply of CGPT token (ENV)
+// Maximum Supply of KIMA token (ENV)
 const MaxSupply = process.env.CGPT_MAX_SUPPLY;
 
 const cache = new NodeCache({ stdTTL: 600 }); // Set the cache expiration time to 600 seconds (10 minutes)
@@ -21,115 +21,180 @@ const cache = new NodeCache({ stdTTL: 600 }); // Set the cache expiration time t
 // List of contract addresses with additional information
 const contractAddresses = [
   {
-    address: '0x1f7bAAf93e0449394e80f3A24c14fB2fA667495c',
-    chain: 'BSC',
+    address: '0x170435cBD12058Fd99fE4FB88e69a6593b5f9586',
+    chain: 'Arbitrum',
+    type: 'ChainGPT Pad (IDO)',
+    wallet: 'Public Round (ref: tokenomics)', 
+  },
+  {
+    address: '0xD874F18C5683dEE27544875D43f6Adf628b0Ca5f',
+    chain: 'Arbitrum',
+    type: 'DEXTPad (IDO)',
+    wallet: 'Public Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x686392fFd55F6563AA96Ff158a0e320d03c67e2e',
+    chain: 'Arbitrum',
+    type: 'PolkaStarter (IDO)',
+    wallet: 'Public Round (ref: tokenomics)', 
+  },
+  {
+    address: '0xf77d701d4EB2819e2047426C2E8b3E56b7cfDA63',
+    chain: 'Arbitrum',
+    type: 'ChainGPT Pad (Private & KOLs Sale)',
+    wallet: 'Private/KOLs Rounds (ref: tokenomics)', 
+  },
+  {
+    address: '0xFfA133D501A8fc871edcC952b2e1E5d1Dc5b6905',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Early-Backers Round (ref: tokenomics)', 
+  },
+  {
+    address: '0xAa48C7cBb50Aa9005d4284779f917e56ae7C2b0D',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Pre-Seed Round (ref: tokenomics)', 
+  },
+  {
+    address: '0xB8AB681556eF6d70653f8720A83ba61222E44823',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Seed Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x510B7b7Df04164365c40F81E45c42a4a56F6c4FA',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Pre-Sale Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x4451E20834614c8bA30dA11A4d00dA7F557B4108',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
     wallet: 'KOLs Round (ref: tokenomics)', 
   },
- // {
- //   address: '0x77A8b449e7cd61dd54B755034Baf9d00EeeD1076',
- //   chain: 'BSC',
- //   type: 'TeamFinance Vesting',
- //   wallet: 'Seedify IDO Fee (3.5%) in tokens', 
- // },
   {
-    address: '0x0aaf30015ee2393dbeab2d8830f6d244f2dfa0f1',
-    chain: 'BSC',
+    address: '0x0EBe72Fcf570095C9e0e6A4b0aF78608Bf3FD918',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
-    wallet: 'Farming/Staking (ref: tokenomics)', 
+    wallet: 'Strategic-1 Round (ref: tokenomics)', 
   },
   {
-    address: '0xb63ea5700834975e8349cfd2d54216f7749b0e49',
-    chain: 'BSC',
+    address: '0x7Bcb0B84f35BA7BA09bF9A0717Ad4E9B9556e6A9',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
-    wallet: 'Liquidity Allocation (ref: tokenomics)', 
+    wallet: 'Strategic-2 Round (ref: tokenomics)', 
   },
   {
-    address: '0x9d9ceebf7fb22df325c37591c43c7c0e0f36c6a2',
-    chain: 'BSC',
+    address: '0xCeD84552224109be6b93b332c9E7c5663A31BFf2',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
-    wallet: 'Private B Round (ref: tokenomics)', 
+    wallet: 'Private-1 Round (ref: tokenomics)', 
   },
   {
-    address: '0x2d842cf79aa3d6bcef9e37dd9d8809ebab813ad5',
-    chain: 'BSC',
+    address: '0x8F2a87aC43d136371D8c0Fd4581f3c1f3F490617',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
-    wallet: 'Private A Round (ref: tokenomics)', 
+    wallet: 'Private-2 Round (ref: tokenomics)', 
   },
   {
-    address: '0x73e49c140c35fc1cc0c716f00d435e22ab8c1305',
-    chain: 'BSC',
+    address: '0xD3FfB66B40A4ee308e18337530Dd8c8D0DA6390C',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
-    wallet: 'Treasury, Team, DAO Fund, Marketing, Development (ref: tokenomics)', 
+    wallet: 'Team Round (ref: tokenomics)', 
   },
   {
-    address: '0x39f119f1d89ba0e14daded2a5901f3c42135726c',
-    chain: 'BSC',
+    address: '0xf9886ce6Fa93943AeE6f7662c70eba753180dd53',
+    chain: 'Arbitrum',
     type: 'TeamFinance Vesting',
-    wallet: 'Available Advisory Tokens (ref: tokenomics)', 
+    wallet: 'Advisors Round (ref: tokenomics)', 
   },
-//  {
-//    address: '0x915a6fF38cab0bB0B027179D7b5f196DAB25C626',
-//    chain: 'BSC',
-//    type: 'IDO Round Vesting',
-//    wallet: 'Seedify IDO', 
-//  },
-//  {
-//    address: '0x6dAa1b5F9cF268AF2fd93Dff8083E2d3ca237008',
-//    chain: 'BSC',
-//    type: 'Crowdfunding Vesting',
-//    wallet: 'YAYNetwork', 
-//  },
- // {
- //   address: '0x98E9EBc9539d674cbcd505b6A6483991d50c2356',
-//    chain: 'BSC',
-//    type: 'Crowdfunding Vesting',
-//    wallet: 'Decubate', 
-//  },
- // {
- //   address: '0xd377766831DE29B39Ea45687983F9F590add517f',
- //   chain: 'BSC',
- //   type: 'IDO Round Vesting',
- //   wallet: 'EnjinStarter', 
- // },
-//  {
-//    address: '0x436CE2ce8d8d2Ccc062f6e92faF410DB4d397905',
-//    chain: 'BSC',
-//    type: 'IDO Round Vesting',
-//    wallet: 'Poolz', 
-//  },
-      {
-    address: '0x926D28476A4bB4F7E4c27C913a3495b3d7393006',
-    chain: 'BSC',
-    type: 'TeamFinance  Contract (Locked)',
-    wallet: 'Seedify  Incubation Fee (1%)', 
+  {
+    address: '0x85C23fea1918989dE98a176c198e8D571223a198',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Development Fund Round (ref: tokenomics)', 
   },
-//  {
-//    address: '0xd58DE7168b7d22048db5EdAafa07265B70407Bc0',
-//    chain: 'BSC',
-//    type: 'IDO Round Vesting',
-//    wallet: 'WePad', 
-//  },
-//  {
-//    address: '0x765a6ee976137801F2661c3644E1fde369A8ED18',
-//    chain: 'BSC',
-//    type: 'Staking Pools',
-//    wallet: 'CGPT Staking Rewards & Staked (via Decubate)', 
-//  },
-//  {
-//    address: '0x62A402DEf6Ca37E9CA7a544bE34954748088CCEE',
-//    chain: 'BSC',
-//    type: 'Staking Pools',
-//    wallet: 'ChainGPT Pad Staking Pool', 
-//  },
-//  {
-//    address: '0x28FBFA75850E246BdD454A0e76FeAA42D771757B',
-//    chain: 'BSC',
-//    type: 'Staking Pools',
-//    wallet: 'ChainGPT Pad Staking Pool - Rewards Distributor', 
-//  },
+  {
+    address: '0x63a012D60612B97ADA9156B2900f44EBD31b26Aa',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Marketing Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x280A41c9Fe933BaF84D95f8D1d7Bd022ae8B82d9',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Foundation Round (ref: tokenomics)', 
+  },
+  {
+    address: '0xD1a724B9BD7F4C89549025df3e6652535824a834',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Liquidity Pool Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x5C9612173D2c789EfF7BB0426f153Ce18eF48643',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting',
+    wallet: 'Community + LIP Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x27c7085578c09f9CD4eCc051DB40071B88C0bD4D',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Team Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x9b359EdEFF357FbE23446C0cB537120c572e38a4',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Team Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x1dB6227c797cC5DB1EaCE59fFeC843C654B9Bed5',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Advisory Round (ref: tokenomics)', 
+  },
+  {
+    address: '0xAbb4864d14f8E5C96f73ced9Cdcccc841DE56f6d',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Advisory Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x6858B586AC59Af48112C927F3b70A3cCcbCf4788',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Marketing Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x0CF35e00a32190bef54791D9790A15ec9f0d608F',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Marketing Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x3D52D028526BCAd1f8967e0b522AfE1eC2CC8202',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Foundation Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x6f449832B95DF11c80Cd69dD2aB0664217f173B2',
+    chain: 'Arbitrum',
+    type: 'TeamFinance Vesting ',
+    wallet: 'Foundation Round (ref: tokenomics)', 
+  },
+  {
+    address: '0x1B03cabEf1417e71ef2E365ED23Ffd419B607A3e',
+    chain: 'Arbitrum',
+    type: 'ChainGPT Pad Giveaway ',
+    wallet: 'Foundation Round (ref: tokenomics)', 
+  },
 ];
-
 
 async function getTotalSupply() {
   const cachedTotalSupply = cache.get('totalSupply');
@@ -138,7 +203,7 @@ async function getTotalSupply() {
   }
 
   try {
-    const url = `https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=${cgptContractAddress}&apikey=${apiKey}`;
+    const url = `https://api.arbiscan.io/api?module=stats&action=tokensupply&contractaddress=${cgptContractAddress}&apikey=${apiKey}`;
     const response = await axios.get(url);
     const result = response.data.result;
 
@@ -166,7 +231,7 @@ app.get('/', async (req, res) => {
       
         await new Promise(resolve => setTimeout(resolve, 250));
 
-      const url = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
+      const url = `https://api.arbiscan.io/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
       const response = await axios.get(url);
       const balance = parseInt(response.data.result);
 
@@ -181,7 +246,7 @@ app.get('/', async (req, res) => {
 
     for (const { address, balance, chain, type, wallet } of balances) {
       totalBalance += balance;
-      const bscScanLink = `https://bscscan.com/token/${cgptContractAddress}?a=${address}`;
+      const bscScanLink = `https://arbiscan.io/token/${cgptContractAddress}?a=${address}`;
  
       tableRows += `<tr>
       <td><a href="${bscScanLink}" target="_blank">${address}</a></td>
@@ -283,15 +348,15 @@ app.get('/', async (req, res) => {
     }
   </style>
   
-  <h1>$CGPT Circulating Supply Tracker</h1>
-  <p>Total Supply: 1,000,000,000</p>
-  <p>Burnt $CGPT: ${burntTokens.toLocaleString()}</p>
-  <p>Live Circulating Supply of $CGPT: ${totalSupply.toLocaleString()} </p>
+  <h1>$KIMA Circulating Supply Tracker</h1>
+  <p>Total Supply: 210,000,000</p>
+  <p>Burnt $KIMA: ${burntTokens.toLocaleString()}</p>
+  <p>Live Circulating Supply of $KIMA: ${totalSupply.toLocaleString()} </p>
   <br><br>
   <table>
     <tr class="title-row">
       <th>Contract Address</th>
-      <th>Balance (CGPT)</th>
+      <th>Balance (KIMA)</th>
       <th>Chain</th>
       <th>Type</th>
       <th>Name</th>
@@ -301,7 +366,7 @@ app.get('/', async (req, res) => {
       <td colspan="5"></td>
     </tr>
     <tr class="total-supply-row">
-      <td>$CGPT Circulating Supply</td>
+      <td>$KIMA Circulating Supply</td>
       <td>${totalSupply.toLocaleString()}</td>
       <td></td>
       <td></td>
@@ -336,7 +401,7 @@ app.get('/supply', async (req, res) => {
       // Introduce a delay of 250ms (1 second / 4) between each API call
       await new Promise(resolve => setTimeout(resolve, 250));
 
-      const url = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
+      const url = `https://api.arbiscan.io/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
       const response = await axios.get(url);
       const balance = parseInt(response.data.result);
 
@@ -388,7 +453,7 @@ app.get('/totalsupply', async (req, res) => {
     for (const { address, chain, type, wallet, name } of contractAddresses) {
         await new Promise(resolve => setTimeout(resolve, 250));
 
-      const url = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
+      const url = `https://api.arbiscan.io/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
       const response = await axios.get(url);
       const balance = parseInt(response.data.result);
 
@@ -441,7 +506,7 @@ app.get('/burn', async (req, res) => {
     for (const { address, chain, type, wallet, name } of contractAddresses) {
         await new Promise(resolve => setTimeout(resolve, 250));
 
-      const url = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
+      const url = `https://api.arbiscan.io/api?module=account&action=tokenbalance&contractaddress=${cgptContractAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
       const response = await axios.get(url);
       const balance = parseInt(response.data.result);
 
