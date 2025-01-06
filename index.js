@@ -189,7 +189,7 @@ const contractAddresses = [
     wallet: 'Foundation Round (ref: tokenomics)', 
   },
   {
-    address: '0x4aBf68eCF26E70b1C028224ba36729299f6Cc013',
+    address: '0x102765e95BE510FF5F9962B70D8e706359dE121b',
     chain: 'Arbitrum',
     type: 'ChainGPT Pad Giveaway ',
     wallet: 'Foundation Round (ref: tokenomics)', 
